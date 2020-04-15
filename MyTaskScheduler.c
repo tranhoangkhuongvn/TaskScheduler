@@ -183,7 +183,33 @@ BinomialHeap* BinomialHeapUnion(BinomialHeap *T1, BinomialHeap *T2)
 }
 
 
+BinomialHeap *Reverse(HeapNode* root)
+{
+	//Input root is the left most child of the removed minimum node
+	BinomialHeap *reversedHeap = newHeap();
+	HeapNode *next;
+	HeapNode *tail = NULL;
+	if (root == NULL)
+		return NULL;
+	root->parent_ptr = NULL;
+	while (root->sibling_ptr)
+	{
+		next = root->sibling_ptr;
+		root->sibling_ptr = tail;
+		tail = root;
+		root = next;
+		root->parent_ptr = NULL;
+	}
+	root->sibling_ptr = tail;
+
+	reversedHeap->header = root;
+
+	return reversedHeap;
+}
+
+
 // put the time complexity analysis for Insert() here
+// Time complexity: O(log(n)) for the binomial heap union function
 void Insert(BinomialHeap *T, int k, int n, int c, int r, int d)
 {	// k: key, n: task name, c: execution time, r: release time, d:deadline
 	// You don't need to check if this task already exists in T
@@ -199,9 +225,38 @@ void Insert(BinomialHeap *T, int k, int n, int c, int r, int d)
 HeapNode *RemoveMin(BinomialHeap *T)
 {
  // put your code here
-    HeapNode *temp = NULL;
+    HeapNode *currNode = T->header->sibling_ptr;
+    HeapNode *prevNode = T->header;
+    HeapNode *minNode = T->header;
+    HeapNode *prevMinNode = NULL;
+    //Find the minimum node (root)
+    while (currNode)
+    {
+    	if (currNode->key < minNode->key)
+    	{
+    		minNode = currNode;
+    		prevMinNode = prevNode;
+    	}
+    	prevNode = currNode;
+    	currNode = currNode->sibling_ptr;
+    }
+	// Remove the minimum root
+	if (prevMinNode == NULL)
+	{
+		//root header 1st node is the minimum
+		T->header = T->header->sibling_ptr;
+	}
+	else
+	{
+		// remove the min node from root list
+		// prevMinNode -> minNode -> minNode_sibling
+		prevMinNode->sibling_ptr = minNode->sibling_ptr;
+	}
 
-    return temp;
+	BinomialHeap *reversed_child = newHeap();
+
+
+    return minNode;
 }
 
 
