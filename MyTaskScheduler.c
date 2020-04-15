@@ -255,6 +255,10 @@ HeapNode *RemoveMin(BinomialHeap *T)
 
 	BinomialHeap *reversed_child = newHeap();
 
+	reversed_child = Reverse(minNode->child_ptr);
+
+	T = BinomialHeapUnion(T, reversed_child);
+
 
     return minNode;
 }
