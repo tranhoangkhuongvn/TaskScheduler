@@ -309,6 +309,12 @@ int TaskScheduler(char *f1, char *f2, int m )
 	{
 		printf("Task %d %d %d %d \n", v, c, r, d);
 		count++;
+		//if any value is less than 0 then there is an invalid input
+		if ((v < 0) || (c < 0) || (r < 0) || (d < 0))
+		{
+			printf("Invalid negative inputs\n");
+			return -1;
+		}
 	}
     //Build the Release Time Binomial Heap
 
