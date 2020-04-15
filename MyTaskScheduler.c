@@ -87,6 +87,7 @@ void BinomialHeapLink(HeapNode *T1, HeapNode *T2)
 
 //Merge the root list of two binomial heap into 1
 // with monotonically increasing order of the root degree
+// Time complexity: O(m) with m is the total nodes of two heaps
 HeapNode* BinomialHeapMerge(BinomialHeap *T1, BinomialHeap *T2)
 {
 	HeapNode *temp = NULL;
@@ -124,6 +125,7 @@ HeapNode* BinomialHeapMerge(BinomialHeap *T1, BinomialHeap *T2)
 
 //Unite the two binomial heap
 //Follow the pseudocode from CLRS Chapter 19
+// Time complexity: O(log(n)) with n is the total nodes of two heaps
 BinomialHeap* BinomialHeapUnion(BinomialHeap *T1, BinomialHeap *T2)
 {
 	BinomialHeap *binomialHeap = newHeap();
@@ -145,6 +147,7 @@ BinomialHeap* BinomialHeapUnion(BinomialHeap *T1, BinomialHeap *T2)
 		if ((x->degree != next_x->degree) ||
 			((next_x->sibling_ptr != NULL) && (next_x->sibling_ptr->degree == x->degree)))
 		{
+			//Case 1 and 2
 			prev_x = x;
 			x = next_x;
 		}
@@ -152,11 +155,13 @@ BinomialHeap* BinomialHeapUnion(BinomialHeap *T1, BinomialHeap *T2)
 		{
 			if (x->key <= next_x->key)
 			{
+				//Case 3
 				x->sibling_ptr = next_x->sibling_ptr;
 				BinomialHeapLink(next_x, x);
 			}
 			else
 			{
+				//Case 4
 				if (prev_x == NULL)
 				{
 					binomialHeap->header = next_x;
@@ -183,17 +188,10 @@ void Insert(BinomialHeap *T, int k, int n, int c, int r, int d)
 {	// k: key, n: task name, c: execution time, r: release time, d:deadline
 	// You don't need to check if this task already exists in T
 	//put your code here
-	HeapNode* temp = newHeapNode(k, n, c, r, d, 0);
-	if (T->header == NULL)
-	{
-		T->header = temp;
-		T->size++;
-		return;
-	}
-	else
-	{
-
-	}
+	HeapNode* newNode = newHeapNode(k, n, c, r, d, 0);
+	BinomialHeap *tempHeap = newHeap();
+	tempHeap->header = newNode;
+	T = BinomialHeapUnion(T, tempHeap);
 
 }
 
