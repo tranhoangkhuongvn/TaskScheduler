@@ -1,0 +1,15 @@
+3 Core1 2
+1 Core3 2
+2 Core2 2
+4 Core4 4
+5 Core1 4
+14 Core3 7
+15 Core2 7
+6 Core4 7
+7 Core1 7
+8 Core3 8
+9 Core2 8
+10 Core4 8
+11 Core1 8
+12 Core3 9
+where task12 misses its deadline.

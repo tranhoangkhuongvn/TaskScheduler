@@ -1,0 +1,9 @@
+1 Core1 0
+2 Core2 0
+3 Core1 1
+4 Core2 1
+5 Core1 2
+6 Core2 3
+7 Core1 3
+8 Core2 4
+where task8 misses its deadline.

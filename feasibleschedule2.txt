@@ -1,0 +1,10 @@
+1 Core3 0
+2 Core1 0
+3 Core2 1
+4 Core1 1
+5 Core3 1
+6 Core3 3
+7 Core1 3
+8 Core2 3
+9 Core2 4
+where task9 misses its deadline.
