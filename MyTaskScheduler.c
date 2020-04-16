@@ -65,16 +65,17 @@ BinomialHeap *newHeap()
 
 //Link two binomial heaps of same degree
 //Time complexity O(1)
-void BinomialHeapLink(HeapNode *T1, HeapNode *T2)
+HeapNode* BinomialHeapLink(HeapNode *T1, HeapNode *T2)
 {
 	assert(T1->degree == T2->degree);
-	//Pick the one with larger key as the new root
-	if (T2->key > T1->key)
+	//Pick the one with smaller key as the new root
+	if (T2->key < T1->key)
 	{
 		T1->parent_ptr = T2;
 		T1->sibling_ptr = T2->child_ptr;
 		T2->child_ptr = T1;
 		T2->degree++;
+		return T2;
 	}
 	else
 	{
@@ -82,6 +83,7 @@ void BinomialHeapLink(HeapNode *T1, HeapNode *T2)
 		T2->sibling_ptr = T1->child_ptr;
 		T1->child_ptr = T2;
 		T1->degree++;
+		return T1;
 	}
 }
 
@@ -90,38 +92,40 @@ void BinomialHeapLink(HeapNode *T1, HeapNode *T2)
 // Time complexity: O(m) with m is the total nodes of two heaps
 HeapNode* BinomialHeapMerge(BinomialHeap *T1, BinomialHeap *T2)
 {
-	HeapNode *temp = malloc(sizeof(HeapNode));
+	HeapNode *root = NULL;
 
+	HeapNode ** pos = &root;
 	HeapNode *curr1 = T1->header;
 	HeapNode *curr2 = T2->header;
+
 	while (curr1 && curr2)
 	{
 		if (curr1->degree < curr2->degree)
 		{
-			temp = curr1;
+			*pos = curr1;
 			curr1 = curr1->sibling_ptr;
 
 		}
 		else
 		{
-			temp = curr2;
+			*pos = curr2;
 			curr2 = curr2->sibling_ptr;
 
 		}
-		temp = temp->sibling_ptr;
+		pos = &(*pos)->sibling_ptr;
 	}
 
 	//Attach the remaining heap into temp
 	if (curr1)
 	{
-		temp = curr1;
+		*pos = curr1;
 	}
 	if (curr2)
 	{
-		temp = curr2;
+		*pos = curr2;
 	}
 
-	return temp;
+	return root;
 }
 
 //Unite the two binomial heap
@@ -158,7 +162,7 @@ BinomialHeap* BinomialHeapUnion(BinomialHeap *T1, BinomialHeap *T2)
 			{
 				//Case 3
 				x->sibling_ptr = next_x->sibling_ptr;
-				BinomialHeapLink(next_x, x);
+				x = BinomialHeapLink(next_x, x);
 			}
 			else
 			{
@@ -171,7 +175,7 @@ BinomialHeap* BinomialHeapUnion(BinomialHeap *T1, BinomialHeap *T2)
 				{
 					prev_x->sibling_ptr = next_x;
 				}
-				BinomialHeapLink(x, next_x);
+				x = BinomialHeapLink(x, next_x);
 				x = next_x;
 			}
 
