@@ -90,20 +90,21 @@ void BinomialHeapLink(HeapNode *T1, HeapNode *T2)
 // Time complexity: O(m) with m is the total nodes of two heaps
 HeapNode* BinomialHeapMerge(BinomialHeap *T1, BinomialHeap *T2)
 {
-	HeapNode *temp = NULL;
+	HeapNode *temp = malloc(sizeof(HeapNode));
+
 	HeapNode *curr1 = T1->header;
 	HeapNode *curr2 = T2->header;
 	while (curr1 && curr2)
 	{
 		if (curr1->degree < curr2->degree)
 		{
-			temp->sibling_ptr = curr1;
+			temp = curr1;
 			curr1 = curr1->sibling_ptr;
 
 		}
 		else
 		{
-			temp->sibling_ptr = curr2;
+			temp = curr2;
 			curr2 = curr2->sibling_ptr;
 
 		}
@@ -210,7 +211,7 @@ BinomialHeap *Reverse(HeapNode* root)
 
 // put the time complexity analysis for Insert() here
 // Time complexity: O(log(n)) for the binomial heap union function
-void Insert(BinomialHeap *T, int k, int n, int c, int r, int d)
+BinomialHeap* Insert(BinomialHeap *T, int k, int n, int c, int r, int d)
 {	// k: key, n: task name, c: execution time, r: release time, d:deadline
 	// You don't need to check if this task already exists in T
 	//put your code here
@@ -218,7 +219,7 @@ void Insert(BinomialHeap *T, int k, int n, int c, int r, int d)
 	BinomialHeap *tempHeap = newHeap();
 	tempHeap->header = newNode;
 	T = BinomialHeapUnion(T, tempHeap);
-
+	return T;
 }
 
 // put your time complexity for RemoveMin() here
@@ -330,10 +331,48 @@ int TaskScheduler(char *f1, char *f2, int m )
 	return 0;
 }
 
-int main() //sample main for testing
-{ int i;
-  i=TaskScheduler("samplefile1.txt", "feasibleschedule1.txt", 4);
-  if (i==0) printf("No feasible schedule!\n");
 
-  return 0;
+void PrintBinomialHeap(BinomialHeap *T)
+{
+	HeapNode *node = T->header;
+	if (node == NULL)
+	{
+		return;
+	}
+	printf("Binomial Heap: ");
+	while (node)
+	{
+		printf(" B%d ", node->degree);
+		node = node->sibling_ptr;
+	}
+
+
+}
+
+int main() //sample main for testing
+{
+	//int i;
+	//i=TaskScheduler("samplefile1.txt", "feasibleschedule1.txt", 4);
+	//if (i==0) printf("No feasible schedule!\n");
+
+
+	//Test binomial heaps helper functions
+	BinomialHeap *myHeap = newHeap();
+	myHeap = Insert(myHeap, 10, 0, 0, 0, 0);
+	myHeap = Insert(myHeap, 1, 0, 0, 0, 0);
+	myHeap = Insert(myHeap, 12, 0, 0, 0, 0);
+	myHeap = Insert(myHeap, 25, 0, 0, 0, 0);
+	myHeap = Insert(myHeap, 18, 0, 0, 0, 0);
+
+	myHeap = Insert(myHeap, 6, 0, 0, 0, 0);
+	myHeap = Insert(myHeap, 8, 0, 0, 0, 0);
+	myHeap = Insert(myHeap, 14, 0, 0, 0, 0);
+	myHeap = Insert(myHeap, 29, 0, 0, 0, 0);
+	myHeap = Insert(myHeap, 11, 0, 0, 0, 0);
+	myHeap = Insert(myHeap, 17, 0, 0, 0, 0);
+	myHeap = Insert(myHeap, 38, 0, 0, 0, 0);
+	myHeap = Insert(myHeap, 27, 0, 0, 0, 0);
+
+	PrintBinomialHeap(myHeap);
+	return 0;
 }
