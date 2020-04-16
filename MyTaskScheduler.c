@@ -447,22 +447,20 @@ int TaskScheduler(char *f1, char *f2, int m )
     //Build the Deadline Binomial Heap
     HeapNode *node;
     BinomialHeap *DeadlineHeap = newHeap();
-    int s1, s2, s; // scheduling points
+    int s1, s2, s, schedule_point; // scheduling points
 
     while (ReleaseTimeHeap->size > 0)
     {
 		s1 = Min(ReleaseTimeHeap); //pick the smallest release time
 		s2 = Min(CoreHeap); // pick the closest core available
 		s = (s1 >= s2) ? s1 : s2; // schedule based on the larger one
-		printf("size: %d\n", ReleaseTimeHeap->size);
+		//printf("size: %d\n", ReleaseTimeHeap->size);
 		while (Min(ReleaseTimeHeap) <= s)
 		{
 			//PrintBinomialHeap(ReleaseTimeHeap);
 			node = RemoveMin(&ReleaseTimeHeap); //take out nodes with smallest release time
+
 			// Build up the Deadline Heap with key is the deadline
-			//printf("After remove min\n");
-			//PrintBinomialHeap(ReleaseTimeHeap);
-			printf("node: %d %d %d %d\n", node->TaskName, node->Etime, node->Rtime, node->Dline);
 			DeadlineHeap = Insert(DeadlineHeap,
 									node->Dline,
 									node->TaskName,
@@ -471,6 +469,8 @@ int TaskScheduler(char *f1, char *f2, int m )
 									node->Dline);
 		}
 
+		// From those selected tasks, choose the next available core and
+		// tasks with closest deadlines
 		while (DeadlineHeap->size > 0)
 		{
 			HeapNode *node_core;
@@ -479,15 +479,16 @@ int TaskScheduler(char *f1, char *f2, int m )
 
 			HeapNode *deadline_node;
 			deadline_node = RemoveMin(&DeadlineHeap);
-			int f = ( deadline_node->Rtime >= node_core->key ) ? deadline_node->Rtime : node_core->key;
-			CoreHeap = Insert(CoreHeap, f + deadline_node->Etime, core, 0,0,0);
-			fprintf(file2, "%d Core%d %d\n",deadline_node->TaskName, core, f);
-			if(deadline_node->key < f + deadline_node->Etime)
+			schedule_point = ( deadline_node->Rtime >= node_core->key ) ? deadline_node->Rtime : node_core->key;
+			CoreHeap = Insert(CoreHeap, schedule_point + deadline_node->Etime, core, 0,0,0);
+			fprintf(file2, "%d Core%d %d\n",deadline_node->TaskName, core, schedule_point);
+			if(deadline_node->key < schedule_point + deadline_node->Etime)
 			{
 				fprintf(file2, "where task%d misses its deadline.\n", deadline_node->TaskName);
                 return 0;
 			}
 
+			// Put tasks with release time prior to core available to deadline heap
 			while (Min(ReleaseTimeHeap) <= Min(CoreHeap))
 			{
 				node = RemoveMin(&ReleaseTimeHeap);
