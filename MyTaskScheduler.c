@@ -138,8 +138,8 @@ BinomialHeap* BinomialHeapUnion(BinomialHeap *T1, BinomialHeap *T2)
 	HeapNode *x;
 	HeapNode *next_x;
 	binomialHeap->header = BinomialHeapMerge(T1, T2);
-	free(T1);
-	free(T2);
+	//free(T1);
+	//free(T2);
 	if (binomialHeap->header == NULL)
 	{
 		return NULL;
@@ -219,10 +219,12 @@ BinomialHeap* Insert(BinomialHeap *T, int k, int n, int c, int r, int d)
 {	// k: key, n: task name, c: execution time, r: release time, d:deadline
 	// You don't need to check if this task already exists in T
 	//put your code here
+	int tempSize = T->size;
 	HeapNode* newNode = newHeapNode(k, n, c, r, d, 0);
 	BinomialHeap *tempHeap = newHeap();
 	tempHeap->header = newNode;
 	T = BinomialHeapUnion(T, tempHeap);
+	T->size = tempSize + 1;
 	return T;
 }
 
@@ -335,6 +337,31 @@ int TaskScheduler(char *f1, char *f2, int m )
 	return 0;
 }
 
+void print_helper(HeapNode *node, HeapNode *prev, int direction)
+{
+	//node is current node
+	//prev is either parent node or previous sibling
+	//direction: 1 - current node is the left-most child
+	//           2 - current node is one of the sibling
+	while (node != NULL)
+	{
+		if (direction == 1)
+		{
+			printf("node\t %d (%d) is child of %d\n", node->key, node->degree, prev->key);
+		}
+		else
+		{
+			printf("node\t %d (%d) is next sibling of %d\n", node->key, node->degree, prev->key);
+		}
+		if (node->child_ptr != NULL)
+		{
+			print_helper(node->child_ptr, node, 1);
+		}
+		prev = node;
+		node = node->sibling_ptr;
+		direction = 2;
+	}
+}
 
 void PrintBinomialHeap(BinomialHeap *T)
 {
@@ -349,7 +376,19 @@ void PrintBinomialHeap(BinomialHeap *T)
 		printf(" B%d ", node->degree);
 		node = node->sibling_ptr;
 	}
+	printf("\n");
+	int i = 0;
+	node = T->header;
+	while (node)
+	{
+		i++;
+		printf("B%d:\n",node->degree);
+		printf("root:\t %d (%d)\n", node->key, node->degree);
+		print_helper(node->child_ptr, node, 1);
+		node = node->sibling_ptr;
+	}
 
+	printf("\n");
 
 }
 
@@ -377,6 +416,7 @@ int main() //sample main for testing
 	myHeap = Insert(myHeap, 38, 0, 0, 0, 0);
 	myHeap = Insert(myHeap, 27, 0, 0, 0, 0);
 
+	printf("Total node: %d\n", myHeap->size);
 	PrintBinomialHeap(myHeap);
 	return 0;
 }
