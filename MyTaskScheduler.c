@@ -300,6 +300,7 @@ int TaskScheduler(char *f1, char *f2, int m )
 	FILE *file1 = fopen(f1, "r");
 	FILE *file2 = fopen(f2, "w");
 	int v, c, r, d;
+	int flag = -1;
 	int count = 0;
 	if (file1 == NULL)
 	{
@@ -312,12 +313,22 @@ int TaskScheduler(char *f1, char *f2, int m )
 		return -1;
 	}
 
-	while (fscanf(file1, " %d %d %d %d ", &v, &c, &r, &d) != EOF)
+	while (1)
 	{
+		flag = fscanf(file1, " %d %d %d %d ", &v, &c, &r, &d);
+		if (flag == EOF)
+		{
+			break;
+		}
+		if (flag < 4)
+		{
+			printf("Invalid inputs\n");
+			return -1;
+		}
 		printf("Task %d %d %d %d \n", v, c, r, d);
 		count++;
 		//if any value is less than 0 then there is an invalid input
-		if ((v < 0) || (c < 0) || (r < 0) || (d < 0))
+		if ((v < 0) || (c <= 0) || (r < 0) || (d <= 0))
 		{
 			printf("Invalid negative inputs\n");
 			return -1;
@@ -394,12 +405,16 @@ void PrintBinomialHeap(BinomialHeap *T)
 
 int main() //sample main for testing
 {
+	int i;
+	i=TaskScheduler("samplefile0.txt", "feasibleschedule0.txt", 4);
+	if (i==0) printf("No feasible schedule!\n");
 	//int i;
 	//i=TaskScheduler("samplefile1.txt", "feasibleschedule1.txt", 4);
 	//if (i==0) printf("No feasible schedule!\n");
 
 
 	//Test binomial heaps helper functions
+	/*
 	BinomialHeap *myHeap = newHeap();
 	myHeap = Insert(myHeap, 10, 0, 0, 0, 0);
 	myHeap = Insert(myHeap, 1, 0, 0, 0, 0);
@@ -418,5 +433,6 @@ int main() //sample main for testing
 
 	printf("Total node: %d\n", myHeap->size);
 	PrintBinomialHeap(myHeap);
+	*/
 	return 0;
 }
