@@ -50,6 +50,7 @@ HeapNode *newHeapNode(int k, int n, int c, int r, int d, int degree)
 	return newNode;
 }
 
+const int MAX_TASK_SIZE = 10000;
 // create a new empty heap-based priority queue
 BinomialHeap *newHeap()
 { // this function creates an empty binomial heap-based priority queue
@@ -62,6 +63,17 @@ BinomialHeap *newHeap()
 
 	return T;
 }
+
+HeapNode* BinomialHeapLink(HeapNode *T1, HeapNode *T2);
+void print_helper(HeapNode *node, HeapNode *prev, int direction);
+void PrintBinomialHeap(BinomialHeap *T);
+HeapNode* BinomialHeapMerge(BinomialHeap *T1, BinomialHeap *T2);
+BinomialHeap* BinomialHeapUnion(BinomialHeap *T1, BinomialHeap *T2);
+BinomialHeap *Reverse(HeapNode* root);
+BinomialHeap* Insert(BinomialHeap *T, int k, int n, int c, int r, int d);
+HeapNode *RemoveMin(BinomialHeap **T);
+int Min(BinomialHeap *T);
+int TaskScheduler(char *f1, char *f2, int m );
 
 //Link two binomial heaps of same degree
 //Time complexity O(1)
@@ -229,7 +241,8 @@ BinomialHeap* Insert(BinomialHeap *T, int k, int n, int c, int r, int d)
 }
 
 // put your time complexity for RemoveMin() here
-HeapNode *RemoveMin(BinomialHeap *T)
+// This function returns the minimum node without modifying the heap in place
+HeapNode *RemoveMin_v0(BinomialHeap *T)
 {
  // put your code here
     HeapNode *currNode = T->header->sibling_ptr;
@@ -265,7 +278,50 @@ HeapNode *RemoveMin(BinomialHeap *T)
 	reversed_child = Reverse(minNode->child_ptr);
 
 	T = BinomialHeapUnion(T, reversed_child);
+	//PrintBinomialHeap(T);
 
+    return minNode;
+}
+
+// Pass pointer to pointer T to modify the heap inplace
+// The function returns the minimum node as well as modifies the heap in place
+HeapNode *RemoveMin(BinomialHeap **T)
+{
+ // put your code here
+    HeapNode *currNode = (*T)->header->sibling_ptr;
+    HeapNode *prevNode = (*T)->header;
+    HeapNode *minNode = (*T)->header;
+    HeapNode *prevMinNode = NULL;
+    //Find the minimum node (root)
+    while (currNode)
+    {
+    	if (currNode->key < minNode->key)
+    	{
+    		minNode = currNode;
+    		prevMinNode = prevNode;
+    	}
+    	prevNode = currNode;
+    	currNode = currNode->sibling_ptr;
+    }
+	// Remove the minimum root
+	if (prevMinNode == NULL)
+	{
+		//root header 1st node is the minimum
+		(*T)->header = (*T)->header->sibling_ptr;
+	}
+	else
+	{
+		// remove the min node from root list
+		// prevMinNode -> minNode -> minNode_sibling
+		prevMinNode->sibling_ptr = minNode->sibling_ptr;
+	}
+
+	BinomialHeap *reversed_child = newHeap();
+
+	reversed_child = Reverse(minNode->child_ptr);
+
+	*T = BinomialHeapUnion(*T, reversed_child);
+	//PrintBinomialHeap(T);
 
     return minNode;
 }
@@ -299,6 +355,7 @@ int TaskScheduler(char *f1, char *f2, int m )
 	//Read in the files
 	FILE *file1 = fopen(f1, "r");
 	FILE *file2 = fopen(f2, "w");
+	int task_list[MAX_TASK_SIZE][4];
 	int v, c, r, d;
 	int flag = -1;
 	int count = 0;
@@ -325,7 +382,11 @@ int TaskScheduler(char *f1, char *f2, int m )
 			printf("Invalid inputs\n");
 			return -1;
 		}
-		printf("Task %d %d %d %d \n", v, c, r, d);
+
+		task_list[count][0] = v;
+		task_list[count][1] = c;
+		task_list[count][2] = r;
+		task_list[count][3] = d;
 		count++;
 		//if any value is less than 0 then there is an invalid input
 		if ((v < 0) || (c <= 0) || (r < 0) || (d <= 0))
@@ -334,7 +395,17 @@ int TaskScheduler(char *f1, char *f2, int m )
 			return -1;
 		}
 	}
+	//print task list for verification
+	/*
+	for (int i = 0; i < count; i++)
+	{
+		printf("Task %d %d %d %d \n", task_list[i][0], task_list[i][1], task_list[i][2], task_list[i][3]);
+	}
+	*/
+
+
     //Build the Release Time Binomial Heap
+	BinomialHeap *ReleaseTimeHeap = newHeap();
 
 
     //Build the Deadline Binomial Heap
@@ -406,15 +477,15 @@ void PrintBinomialHeap(BinomialHeap *T)
 int main() //sample main for testing
 {
 	int i;
-	i=TaskScheduler("samplefile0.txt", "feasibleschedule0.txt", 4);
-	if (i==0) printf("No feasible schedule!\n");
-	//int i;
+	//i=TaskScheduler("samplefile0.txt", "feasibleschedule0.txt", 4);
+	//if (i==0) printf("No feasible schedule!\n");
+
 	//i=TaskScheduler("samplefile1.txt", "feasibleschedule1.txt", 4);
 	//if (i==0) printf("No feasible schedule!\n");
 
 
 	//Test binomial heaps helper functions
-	/*
+
 	BinomialHeap *myHeap = newHeap();
 	myHeap = Insert(myHeap, 10, 0, 0, 0, 0);
 	myHeap = Insert(myHeap, 1, 0, 0, 0, 0);
@@ -433,6 +504,9 @@ int main() //sample main for testing
 
 	printf("Total node: %d\n", myHeap->size);
 	PrintBinomialHeap(myHeap);
-	*/
+	printf("Min value: %d\n", Min(myHeap));
+	printf("Min node value: %d\n", RemoveMin(&myHeap)->key);
+	printf("Heap after extract min value: \n");
+	PrintBinomialHeap(myHeap);
 	return 0;
 }
